@@ -23,17 +23,17 @@
       }
 
       <div class="form-group">
-        <label for="email" class="form-label">Email Address</label>
+        <label for="email" class="form-label">{{ isLoginMode() ? 'Email or Username' : 'Email Address' }}</label>
         <input 
-          type="email" 
+          [type]="isLoginMode() ? 'text' : 'email'" 
           id="email" 
           name="email" 
           [(ngModel)]="email" 
           required 
-          email
+          [email]="!isLoginMode()"
           class="form-control" 
-          placeholder="your@email.com"
-          autocomplete="email"
+          [placeholder]="isLoginMode() ? 'your@email.com or username' : 'your@email.com'"
+          [autocomplete]="isLoginMode() ? 'username' : 'email'"
         />
       </div>
 

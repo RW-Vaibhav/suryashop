@@ -57,18 +57,21 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<ActionResult<AuthResponseDto>> Login(LoginDto loginDto)
     {
-        var user = await _context.Users.SingleOrDefaultAsync(x => x.Email.ToLower() == loginDto.Email.ToLower());
+        var input = loginDto.Email.ToLower();
+        var user = await _context.Users.SingleOrDefaultAsync(x => 
+            x.Email.ToLower() == input || 
+            x.Username.ToLower() == input);
 
         if (user == null)
         {
-            return Unauthorized("Invalid email or password.");
+            return Unauthorized("Invalid email/username or password.");
         }
 
         var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, loginDto.Password);
 
         if (result == PasswordVerificationResult.Failed)
         {
-            return Unauthorized("Invalid email or password.");
+            return Unauthorized("Invalid email/username or password.");
         }
 
         return new AuthResponseDto
