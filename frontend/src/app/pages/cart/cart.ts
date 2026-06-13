@@ -87,6 +87,7 @@ export class CartComponent {
     this.orderService.placeOrder(this.shippingAddress).subscribe({
       next: (order) => {
         this.isCheckingOut.set(false);
+        this.cartService.cartItems.set([]); // Instantly clear cart badge and memory
         this.toastService.show('Order placed successfully!', 'success');
         this.router.navigate(['/payment-success'], { queryParams: { orderId: order.id } });
       },
