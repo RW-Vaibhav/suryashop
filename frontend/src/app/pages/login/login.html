@@ -1,70 +1,155 @@
 <div class="auth-container">
   <div class="glass-card auth-card">
     <div class="auth-header">
-      <h2>{{ isLoginMode() ? 'Welcome Back' : 'Create Account' }}</h2>
-      <p>{{ isLoginMode() ? 'Access your cart and orders' : 'Register to start shopping' }}</p>
-    </div>
-
-    <form (ngSubmit)="onSubmit()" #authForm="ngForm" class="auth-form">
-      @if (!isLoginMode()) {
-        <div class="form-group">
-          <label for="username" class="form-label">Username</label>
-          <input 
-            type="text" 
-            id="username" 
-            name="username" 
-            [(ngModel)]="username" 
-            required 
-            class="form-control" 
-            placeholder="johndoe"
-            autocomplete="username"
-          />
-        </div>
-      }
-
-      <div class="form-group">
-        <label for="email" class="form-label">{{ isLoginMode() ? 'Email or Username' : 'Email Address' }}</label>
-        <input 
-          [type]="isLoginMode() ? 'text' : 'email'" 
-          id="email" 
-          name="email" 
-          [(ngModel)]="email" 
-          required 
-          [email]="!isLoginMode()"
-          class="form-control" 
-          [placeholder]="isLoginMode() ? 'your@email.com or username' : 'your@email.com'"
-          [autocomplete]="isLoginMode() ? 'username' : 'email'"
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="password" class="form-label">Password</label>
-        <input 
-          type="password" 
-          id="password" 
-          name="password" 
-          [(ngModel)]="password" 
-          required 
-          minlength="6"
-          class="form-control" 
-          placeholder="••••••••"
-          autocomplete="current-password"
-        />
-      </div>
-
-      <button type="submit" [disabled]="isLoading() || !authForm.form.valid" class="btn btn-primary btn-block">
-        @if (isLoading()) {
-          <span class="spinner"></span> Processing...
+      <h2>
+        @if (isForgotPasswordMode()) {
+          Reset Password
         } @else {
-          {{ isLoginMode() ? 'Login' : 'Sign Up' }}
+          {{ isLoginMode() ? 'Welcome Back' : 'Create Account' }}
         }
-      </button>
-    </form>
-
-    <div class="auth-toggle">
-      <button (click)="toggleMode()" class="toggle-link">
-        {{ isLoginMode() ? "Don't have an account? Sign Up" : "Already have an account? Log In" }}
-      </button>
+      </h2>
+      <p>
+        @if (isForgotPasswordMode()) {
+          Enter your email to set a new password
+        } @else {
+          {{ isLoginMode() ? 'Access your cart and orders' : 'Register to start shopping' }}
+        }
+      </p>
     </div>
+
+    @if (isForgotPasswordMode()) {
+      <!-- Reset Password Form -->
+      <form (ngSubmit)="onResetPassword()" #resetForm="ngForm" class="auth-form">
+        <div class="form-group">
+          <label for="resetEmail" class="form-label">Email Address</label>
+          <input 
+            type="email" 
+            id="resetEmail" 
+            name="resetEmail" 
+            [(ngModel)]="email" 
+            #resetEmailInput="ngModel"
+            required 
+            email
+            class="form-control" 
+            placeholder="your@email.com"
+            autocomplete="email"
+          />
+          @if (resetEmailInput.invalid && (resetEmailInput.dirty || resetEmailInput.touched)) {
+            <span class="form-error">Please enter a valid email address.</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="newPassword" class="form-label">New Password</label>
+          <input 
+            type="password" 
+            id="newPassword" 
+            name="newPassword" 
+            [(ngModel)]="password" 
+            #newPassInput="ngModel"
+            required 
+            minlength="6"
+            class="form-control" 
+            placeholder="••••••••"
+            autocomplete="new-password"
+          />
+          @if (newPassInput.invalid && (newPassInput.dirty || newPassInput.touched)) {
+            <span class="form-error">Password must be at least 6 characters.</span>
+          }
+        </div>
+
+        <button type="submit" [disabled]="isLoading() || !resetForm.form.valid" class="btn btn-primary btn-block">
+          @if (isLoading()) {
+            <span class="spinner"></span> Processing...
+          } @else {
+            Reset Password
+          }
+        </button>
+      </form>
+
+      <div class="auth-toggle">
+        <button (click)="toggleForgotPassword(false)" class="toggle-link">
+          Back to Login
+        </button>
+      </div>
+    } @else {
+      <!-- Login / Register Form -->
+      <form (ngSubmit)="onSubmit()" #authForm="ngForm" class="auth-form">
+        @if (!isLoginMode()) {
+          <div class="form-group">
+            <label for="username" class="form-label">Username</label>
+            <input 
+              type="text" 
+              id="username" 
+              name="username" 
+              [(ngModel)]="username" 
+              required 
+              class="form-control" 
+              placeholder="johndoe"
+              autocomplete="username"
+            />
+          </div>
+        }
+
+        <div class="form-group">
+          <label for="email" class="form-label">{{ isLoginMode() ? 'Email or Username' : 'Email Address' }}</label>
+          <input 
+            [type]="isLoginMode() ? 'text' : 'email'" 
+            id="email" 
+            name="email" 
+            [(ngModel)]="email" 
+            #emailInput="ngModel"
+            required 
+            [email]="!isLoginMode()"
+            class="form-control" 
+            [placeholder]="isLoginMode() ? 'your@email.com or username' : 'your@email.com'"
+            [autocomplete]="isLoginMode() ? 'username' : 'email'"
+          />
+          @if (emailInput.invalid && (emailInput.dirty || emailInput.touched)) {
+            <span class="form-error">
+              {{ isLoginMode() ? 'Email or username is required.' : 'Please enter a valid email address.' }}
+            </span>
+          }
+        </div>
+
+        <div class="form-group">
+          <div class="password-label-wrapper">
+            <label for="password" class="form-label">Password</label>
+            @if (isLoginMode()) {
+              <button type="button" (click)="toggleForgotPassword(true)" class="forgot-link">Forgot Password?</button>
+            }
+          </div>
+          <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            [(ngModel)]="password" 
+            #passInput="ngModel"
+            required 
+            minlength="6"
+            class="form-control" 
+            placeholder="••••••••"
+            autocomplete="current-password"
+          />
+          @if (passInput.invalid && (passInput.dirty || passInput.touched)) {
+            <span class="form-error">Password must be at least 6 characters.</span>
+          }
+        </div>
+
+        <button type="submit" [disabled]="isLoading() || !authForm.form.valid" class="btn btn-primary btn-block">
+          @if (isLoading()) {
+            <span class="spinner"></span> Processing...
+          } @else {
+            {{ isLoginMode() ? 'Login' : 'Sign Up' }}
+          }
+        </button>
+      </form>
+
+      <div class="auth-toggle">
+        <button (click)="toggleMode()" class="toggle-link">
+          {{ isLoginMode() ? "Don't have an account? Sign Up" : "Already have an account? Log In" }}
+        </button>
+      </div>
+    }
   </div>
 </div>

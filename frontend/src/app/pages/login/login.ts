@@ -20,6 +20,7 @@ export class LoginComponent {
   // Component state
   isLoginMode = signal(true);
   isLoading = signal(false);
+  isForgotPasswordMode = signal(false);
 
   // Form bindings
   username = '';
@@ -39,7 +40,40 @@ export class LoginComponent {
 
   toggleMode() {
     this.isLoginMode.update(mode => !mode);
+    this.isForgotPasswordMode.set(false);
     this.clearForm();
+  }
+
+  toggleForgotPassword(state: boolean) {
+    this.isForgotPasswordMode.set(state);
+    this.clearForm();
+  }
+
+  onResetPassword() {
+    if (!this.email || !this.password) {
+      this.toastService.show('Please enter both email and new password', 'warning');
+      return;
+    }
+
+    if (this.password.length < 6) {
+      this.toastService.show('Password must be at least 6 characters long', 'warning');
+      return;
+    }
+
+    this.isLoading.set(true);
+
+    this.authService.resetPassword(this.email, this.password).subscribe({
+      next: () => {
+        this.isLoading.set(false);
+        this.toastService.show('Password reset successfully! You can now log in.', 'success');
+        this.toggleForgotPassword(false);
+      },
+      error: (err) => {
+        this.isLoading.set(false);
+        const errMsg = err.error || 'Password reset failed. Please try again.';
+        this.toastService.show(errMsg, 'error');
+      }
+    });
   }
 
   onSubmit() {

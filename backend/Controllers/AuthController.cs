@@ -108,4 +108,20 @@ public class AuthController : ControllerBase
             Role = user.Role
         };
     }
+
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword(ResetPasswordDto dto)
+    {
+        var user = await _context.Users.SingleOrDefaultAsync(x => x.Email.ToLower() == dto.Email.ToLower());
+        if (user == null)
+        {
+            return BadRequest("No account associated with this email address.");
+        }
+
+        user.PasswordHash = _passwordHasher.HashPassword(user, dto.NewPassword);
+        _context.Users.Update(user);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Password reset successfully." });
+    }
 }
