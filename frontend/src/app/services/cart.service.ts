@@ -19,7 +19,7 @@ export interface CartItem {
 export class CartService {
   private http = inject(HttpClient);
   private authService = inject(AuthService);
-  private apiUrl = 'http://localhost:5179/api/cart';
+  private apiUrl = '/api/cart';
 
   cartItems = signal<CartItem[]>([]);
   cartCount = computed(() => this.cartItems().reduce((acc, item) => acc + item.quantity, 0));

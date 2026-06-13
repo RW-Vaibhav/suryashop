@@ -25,7 +25,7 @@ export interface Order {
 })
 export class OrderService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:5179/api/order';
+  private apiUrl = '/api/order';
 
   placeOrder(shippingAddress: string): Observable<Order> {
     return this.http.post<Order>(this.apiUrl, { shippingAddress });

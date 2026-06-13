@@ -14,7 +14,7 @@ export interface User {
 })
 export class AuthService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:5179/api/auth';
+  private apiUrl = '/api/auth';
 
   // State managed via signals
   currentUser = signal<User | null>(null);

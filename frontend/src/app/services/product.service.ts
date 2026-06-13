@@ -19,7 +19,7 @@ export interface Product {
 })
 export class ProductService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:5179/api/product';
+  private apiUrl = '/api/product';
 
   getProducts(search?: string, category?: string, sortBy?: string): Observable<Product[]> {
     let params = new HttpParams();
