@@ -1,0 +1,101 @@
+<div class="container section-padding">
+  <div class="catalog-header">
+    <h1>Product Catalog</h1>
+    <p>Explore our premium collections of tech gear, furniture, and lifestyle items.</p>
+  </div>
+
+  <!-- Search, Filter & Sort Controls -->
+  <div class="controls-wrapper glass-card">
+    <form (ngSubmit)="onSearchSubmit()" class="search-form">
+      <div class="search-input-group">
+        <input 
+          type="text" 
+          name="searchText" 
+          [(ngModel)]="searchText" 
+          placeholder="Search products..." 
+          class="form-control search-control"
+          autocomplete="off"
+        />
+        <button type="submit" class="btn btn-primary btn-search" aria-label="Search">
+          <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20" fill="currentColor">
+            <path d="M784-120 532-372q-30 24-74 38t-90 14q-117 0-198.5-81.5T88-600q0-117 81.5-198.5T368-880q117 0 198.5 81.5T648-600q0 49-14 90t-38 74l252 252-64 64ZM368-240q150 0 255-105t105-255q0-150-105-255T368-720q-150 0-255 105T8-600q0 150 105 255t255 105Z"/>
+          </svg>
+        </button>
+      </div>
+    </form>
+
+    <div class="sort-group">
+      <label for="sortBy" class="sort-label">Sort By</label>
+      <select id="sortBy" (change)="onSortChange($event)" [value]="sortBy()" class="form-control sort-select">
+        <option value="default">Default</option>
+        <option value="price-low">Price: Low to High</option>
+        <option value="price-high">Price: High to Low</option>
+        <option value="rating">Top Rated</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Category Tabs -->
+  <div class="category-tabs-wrapper">
+    <button 
+      (click)="setCategory('')" 
+      class="category-tab" 
+      [class.active]="selectedCategory() === ''"
+    >
+      All Products
+    </button>
+    @for (cat of categories(); track cat) {
+      <button 
+        (click)="setCategory(cat)" 
+        class="category-tab" 
+        [class.active]="selectedCategory() === cat"
+      >
+        {{ cat }}
+      </button>
+    }
+  </div>
+
+  <!-- Catalog Results -->
+  @if (isLoading()) {
+    <div class="loading-container flex-center">
+      <span class="spinner"></span>
+    </div>
+  } @else {
+    @if (products().length === 0) {
+      <div class="glass-card empty-state flex-center">
+        <svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48" fill="var(--text-muted)">
+          <path d="M480-120q-75 0-140.5-28.5t-114-77q-48.5-48.5-77-114T120-480q0-75 28.5-140.5t77-114q48.5-48.5 114-77T480-840q75 0 140.5 28.5t114 77q48.5 48.5 77 114T840-480q0 75-28.5 140.5t-77 114q-48.5 48.5-114 77T480-120Zm0-80q56 0 107.5-19t93.5-54L273-681q-35 42-54 93.5T200-480q0 116 82 198t198 82Zm207-127q35-42 54-93.5T760-480q0-116-82-198t-198-82q-56 0-107.5 19t-93.5 54l408 408Z"/>
+        </svg>
+        <h3>No Products Found</h3>
+        <p>We couldn't find any products matching your search criteria.</p>
+        <button (click)="resetFilters()" class="btn btn-primary btn-reset">Clear Filters</button>
+      </div>
+    } @else {
+      <div class="products-grid">
+        @for (prod of products(); track prod.id) {
+          <div class="glass-card product-card">
+            <div class="product-image-wrapper">
+              <img [src]="prod.imageUrl" [alt]="prod.name" class="product-image" />
+              <span class="category-tag">{{ prod.category }}</span>
+            </div>
+            
+            <div class="product-card-body">
+              <h3 class="product-title">{{ prod.name }}</h3>
+              
+              <div class="product-rating">
+                <span class="stars">★</span>
+                <span class="rating-value">{{ prod.rating }}</span>
+                <span class="reviews-count">({{ prod.reviewsCount }})</span>
+              </div>
+              
+              <div class="product-card-footer">
+                <span class="product-price">{{ prod.price | currency:'INR':'symbol-narrow':'1.2-2' }}</span>
+                <a [routerLink]="['/product', prod.id]" class="btn btn-secondary btn-sm-view">Details</a>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

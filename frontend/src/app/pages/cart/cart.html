@@ -1,0 +1,129 @@
+<div class="container section-padding">
+  <div class="cart-header">
+    <h1>Your Shopping Cart</h1>
+    <p>Review your selections and enter shipping information to place your order.</p>
+  </div>
+
+  @if (cartService.cartItems().length === 0) {
+    <!-- Empty Cart State -->
+    <div class="glass-card empty-cart flex-center">
+      <svg xmlns="http://www.w3.org/2000/svg" height="64" viewBox="0 -960 960 960" width="64" fill="var(--text-muted)">
+        <path d="M280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0-33-23.5-56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T760-160q0-33-23.5-56.5T680-80ZM246-720h592l-86 314q-9 33-37.5 52.5T650-334H334q-32 0-58.5-17.5T237-402l-99-438H80v-80h110l26 116q3-7 8.5-12.5T227-828q10-7 21.5-9.5t23.5-2.5q33 0 56.5 23.5T352-760q0 33-23.5 56.5T280-680q-6 0-11-1t-10-3l-13-56ZM300-640h486l50-180H259l41 180Zm-63 0h599-599Z"/>
+      </svg>
+      <h2>Your Cart is Empty</h2>
+      <p>Browse our catalog and discover premium selections to add here.</p>
+      <a routerLink="/products" class="btn btn-primary">Go Shopping</a>
+    </div>
+  } @else {
+    <!-- Active Cart Layout -->
+    <div class="cart-layout">
+      <!-- Left: Cart Items List -->
+      <div class="cart-items-panel">
+        @for (item of cartService.cartItems(); track item.id) {
+          <div class="glass-card cart-item-row">
+            <div class="item-image-wrapper">
+              <img [src]="item.productImageUrl" [alt]="item.productName" class="item-image" />
+            </div>
+
+            <div class="item-details">
+              <h3 class="item-name"><a [routerLink]="['/product', item.productId]">{{ item.productName }}</a></h3>
+              <span class="item-unit-price">{{ item.productPrice | currency:'INR':'symbol-narrow':'1.2-2' }} each</span>
+            </div>
+
+            <div class="item-quantity">
+              <div class="qty-selector qty-selector-sm">
+                <button (click)="decrementQuantity(item)" [disabled]="item.quantity <= 1" class="qty-btn qty-btn-sm" aria-label="Decrease quantity">-</button>
+                <span class="qty-value qty-value-sm">{{ item.quantity }}</span>
+                <button (click)="incrementQuantity(item)" [disabled]="item.quantity >= item.stockQuantity" class="qty-btn qty-btn-sm" aria-label="Increase quantity">+</button>
+              </div>
+            </div>
+
+            <div class="item-total-price">
+              <span>{{ (item.productPrice * item.quantity) | currency:'INR':'symbol-narrow':'1.2-2' }}</span>
+            </div>
+
+            <div class="item-actions">
+              <button (click)="removeItem(item)" class="btn-remove" aria-label="Remove item">
+                <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20" fill="currentColor">
+                  <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-220h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Right: Summary Card & Shipping Form -->
+      <div class="cart-summary-panel">
+        <div class="glass-card summary-card">
+          <h2>Order Summary</h2>
+          
+          <div class="summary-row">
+            <span>Subtotal</span>
+            <span>{{ cartService.cartSubtotal() | currency:'INR':'symbol-narrow':'1.2-2' }}</span>
+          </div>
+
+          <div class="summary-row">
+            <span>Shipping</span>
+            <span>
+              @if (shippingFee() === 0) {
+                <span class="text-success font-semibold">FREE</span>
+              } @else {
+                {{ shippingFee() | currency:'INR':'symbol-narrow':'1.2-2' }}
+              }
+            </span>
+          </div>
+
+          <!-- Free Shipping Incentive -->
+          @if (cartService.cartSubtotal() < 999) {
+            <div class="free-shipping-promo">
+              Add <strong>{{ (999 - cartService.cartSubtotal()) | currency:'INR':'symbol-narrow':'1.2-2' }}</strong> more for <strong>FREE Shipping!</strong>
+            </div>
+          } @else {
+            <div class="free-shipping-promo success">
+              Congratulations! You qualify for <strong>FREE Shipping</strong>.
+            </div>
+          }
+
+          <div class="summary-divider"></div>
+
+          <div class="summary-row total-row">
+            <span>Total</span>
+            <span class="total-price">{{ orderTotal() | currency:'INR':'symbol-narrow':'1.2-2' }}</span>
+          </div>
+
+          <form (ngSubmit)="onCheckout()" #checkoutForm="ngForm" class="checkout-form">
+            <div class="form-group">
+              <label for="shippingAddress" class="form-label">Shipping Address</label>
+              <textarea 
+                id="shippingAddress" 
+                name="shippingAddress" 
+                [(ngModel)]="shippingAddress" 
+                #addressInput="ngModel"
+                required 
+                rows="3"
+                class="form-control address-textarea" 
+                placeholder="123 Main St, Apt 4B, New York, NY 10001"
+              ></textarea>
+              @if (addressInput.invalid && (addressInput.dirty || addressInput.touched)) {
+                <span class="form-error">Shipping address is required.</span>
+              }
+            </div>
+
+            <button 
+              type="submit" 
+              [disabled]="isCheckingOut() || !checkoutForm.form.valid || cartService.cartItems().length === 0" 
+              class="btn btn-primary btn-block btn-checkout"
+            >
+              @if (isCheckingOut()) {
+                <span class="spinner"></span> Processing Order...
+              } @else {
+                Place Order (Mock Payment)
+              }
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  }
+</div>

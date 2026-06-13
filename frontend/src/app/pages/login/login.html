@@ -1,0 +1,70 @@
+<div class="auth-container">
+  <div class="glass-card auth-card">
+    <div class="auth-header">
+      <h2>{{ isLoginMode() ? 'Welcome Back' : 'Create Account' }}</h2>
+      <p>{{ isLoginMode() ? 'Access your cart and orders' : 'Register to start shopping' }}</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #authForm="ngForm" class="auth-form">
+      @if (!isLoginMode()) {
+        <div class="form-group">
+          <label for="username" class="form-label">Username</label>
+          <input 
+            type="text" 
+            id="username" 
+            name="username" 
+            [(ngModel)]="username" 
+            required 
+            class="form-control" 
+            placeholder="johndoe"
+            autocomplete="username"
+          />
+        </div>
+      }
+
+      <div class="form-group">
+        <label for="email" class="form-label">Email Address</label>
+        <input 
+          type="email" 
+          id="email" 
+          name="email" 
+          [(ngModel)]="email" 
+          required 
+          email
+          class="form-control" 
+          placeholder="your@email.com"
+          autocomplete="email"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password" class="form-label">Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password" 
+          [(ngModel)]="password" 
+          required 
+          minlength="6"
+          class="form-control" 
+          placeholder="••••••••"
+          autocomplete="current-password"
+        />
+      </div>
+
+      <button type="submit" [disabled]="isLoading() || !authForm.form.valid" class="btn btn-primary btn-block">
+        @if (isLoading()) {
+          <span class="spinner"></span> Processing...
+        } @else {
+          {{ isLoginMode() ? 'Login' : 'Sign Up' }}
+        }
+      </button>
+    </form>
+
+    <div class="auth-toggle">
+      <button (click)="toggleMode()" class="toggle-link">
+        {{ isLoginMode() ? "Don't have an account? Sign Up" : "Already have an account? Log In" }}
+      </button>
+    </div>
+  </div>
+</div>

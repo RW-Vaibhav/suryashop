@@ -1,0 +1,150 @@
+.catalog-header {
+  margin-bottom: 40px;
+}
+
+.catalog-header h1 {
+  font-size: 2.2rem;
+  margin-bottom: 8px;
+}
+
+/* --- Control Bar --- */
+.controls-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 24px;
+  margin-bottom: 32px;
+}
+
+.search-form {
+  flex-grow: 1;
+  max-width: 600px;
+}
+
+.search-input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-control {
+  padding-right: 60px;
+  border-radius: var(--border-radius-sm);
+  background: var(--bg-main);
+}
+
+.btn-search {
+  position: absolute;
+  right: 4px;
+  padding: 8px 16px;
+  height: calc(100% - 8px);
+  border-radius: calc(var(--border-radius-sm) - 2px);
+}
+
+.sort-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.sort-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.sort-select {
+  width: 200px;
+  background-color: var(--bg-main);
+  cursor: pointer;
+  padding: 10px 16px;
+}
+
+/* --- Category Tabs --- */
+.category-tabs-wrapper {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 40px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scrollbar-width: none; /* Firefox */
+}
+
+.category-tabs-wrapper::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+.category-tab {
+  padding: 10px 24px;
+  border-radius: 9999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  white-space: nowrap;
+}
+
+.category-tab:hover {
+  color: var(--text-main);
+  border-color: var(--border-color-hover);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.category-tab.active {
+  background: var(--grad-accent);
+  color: var(--text-main);
+  border-color: transparent;
+  box-shadow: var(--shadow-accent);
+}
+
+/* --- Empty State --- */
+.empty-state {
+  flex-direction: column;
+  padding: 80px 24px;
+  text-align: center;
+  gap: 16px;
+}
+
+.empty-state h3 {
+  font-size: 1.5rem;
+  color: var(--text-main);
+  margin-bottom: 4px;
+}
+
+.empty-state p {
+  max-width: 400px;
+  margin-bottom: 12px;
+}
+
+.btn-reset {
+  padding: 10px 24px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .controls-wrapper {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+  
+  .search-form {
+    max-width: 100%;
+  }
+  
+  .sort-group {
+    justify-content: space-between;
+  }
+  
+  .sort-select {
+    flex-grow: 1;
+  }
+}

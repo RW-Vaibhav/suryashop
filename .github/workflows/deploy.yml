@@ -1,0 +1,78 @@
+name: Build and Deploy SuryaShop to AWS EC2
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    # --- Step 1: Set up .NET Core SDK & Build Backend ---
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore Backend Dependencies
+      run: dotnet restore backend/backend.csproj
+
+    - name: Publish Backend (Release)
+      run: dotnet publish backend/backend.csproj -c Release -o backend-publish
+
+    # --- Step 2: Set up Node.js & Build Frontend ---
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Install Frontend Dependencies
+      run: |
+        cd frontend
+        npm ci
+
+    - name: Build Frontend (Production)
+      run: |
+        cd frontend
+        npm run build -- --configuration production
+
+    # --- Step 3: Deploy to AWS EC2 ---
+    - name: Set up SSH Private Key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+    # Deploy Backend Binaries
+    - name: Deploy Backend Binaries
+      run: |
+        rsync -avz --delete backend-publish/ ubuntu@${{ secrets.EC2_HOST }}:/var/www/suryashop-api/
+
+    # Deploy Frontend Static Files
+    - name: Deploy Frontend Files
+      run: |
+        rsync -avz --delete frontend/dist/frontend/browser/ ubuntu@${{ secrets.EC2_HOST }}:/var/www/suryashop-web/
+
+    # Copy Systemd and Nginx template configs (for manual server setup reference)
+    - name: Deploy Config Files
+      run: |
+        scp -o StrictHostKeyChecking=no nginx.conf ubuntu@${{ secrets.EC2_HOST }}:/var/www/
+        scp -o StrictHostKeyChecking=no backend/suryashop.service ubuntu@${{ secrets.EC2_HOST }}:/var/www/
+
+    # Restart backend daemon and reload Nginx
+    - name: Restart Server Services
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ubuntu
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          sudo systemctl restart suryashop.service
+          sudo systemctl reload nginx

@@ -1,0 +1,53 @@
+<header class="navbar-wrapper">
+  <div class="container navbar-container">
+    <a routerLink="/" class="logo">
+      <span>Surya</span>Shop
+    </a>
+    
+    <nav class="nav-links">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
+      <a routerLink="/products" routerLinkActive="active">Products</a>
+    </nav>
+    
+    <div class="nav-actions">
+      <!-- Cart Icon with Badge -->
+      <a routerLink="/cart" class="cart-btn" aria-label="View Cart">
+        <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor">
+          <path d="M280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0-33-23.5-56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T760-160q0-33-23.5-56.5T680-80ZM246-720h592l-86 314q-9 33-37.5 52.5T650-334H334q-32 0-58.5-17.5T237-402l-99-438H80v-80h110l26 116q3-7 8.5-12.5T227-828q10-7 21.5-9.5t23.5-2.5q33 0 56.5 23.5T352-760q0 33-23.5 56.5T280-680q-6 0-11-1t-10-3l-13-56ZM300-640h486l50-180H259l41 180Zm-63 0h599-599Z"/>
+        </svg>
+        @if (authService.isAuthenticated() && cartService.cartCount() > 0) {
+          <span class="cart-badge">{{ cartService.cartCount() }}</span>
+        }
+      </a>
+
+      <!-- Authentication Controls -->
+      @if (authService.isAuthenticated()) {
+        <div class="user-menu">
+          <span class="username-display">Hi, {{ authService.currentUser()?.username }}</span>
+          <button (click)="logout()" class="btn btn-secondary btn-sm-logout">Logout</button>
+        </div>
+      } @else {
+        <a routerLink="/login" class="btn btn-primary btn-sm-login">Login</a>
+      }
+    </div>
+  </div>
+</header>
+
+<main class="main-content">
+  <router-outlet></router-outlet>
+</main>
+
+<footer class="footer-wrapper">
+  <div class="container footer-container">
+    <p>&copy; 2026 SuryaShop.</p>
+  </div>
+</footer>
+
+<!-- Toast notifications -->
+<div class="toast-container">
+  @for (toast of toastService.toasts(); track toast.id) {
+    <div class="toast" [class]="toast.type">
+      <span>{{ toast.message }}</span>
+    </div>
+  }
+</div>

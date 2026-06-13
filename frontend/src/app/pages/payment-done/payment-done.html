@@ -1,0 +1,83 @@
+<div class="container section-padding flex-center">
+  @if (isLoading()) {
+    <div class="loading-container flex-center">
+      <span class="spinner"></span>
+    </div>
+  } @else {
+    @if (order(); as ord) {
+      <div class="glass-card receipt-card">
+        <!-- Success Animation Icon -->
+        <div class="success-icon-wrapper">
+          <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+            <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+            <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+          </svg>
+        </div>
+
+        <div class="receipt-header">
+          <h1>Payment Completed!</h1>
+          <p>Your order has been placed successfully and your product will be dispatched soon.</p>
+        </div>
+
+        <!-- Order Meta Details -->
+        <div class="receipt-details-grid">
+          <div class="detail-tile">
+            <span class="tile-label">Order Reference</span>
+            <span class="tile-value">#{{ ord.id }}</span>
+          </div>
+          <div class="detail-tile">
+            <span class="tile-label">Order Date</span>
+            <span class="tile-value">{{ ord.orderDate | date:'mediumDate' }}</span>
+          </div>
+          <div class="detail-tile">
+            <span class="tile-label">Payment Status</span>
+            <span class="tile-value badge badge-success">Paid</span>
+          </div>
+          <div class="detail-tile">
+            <span class="tile-label">Shipping Address</span>
+            <span class="tile-value address-value">{{ ord.shippingAddress }}</span>
+          </div>
+        </div>
+
+        <div class="receipt-divider"></div>
+
+        <!-- Items Summary List -->
+        <div class="receipt-items-section">
+          <h3>Order Details</h3>
+          <div class="items-list">
+            @for (item of ord.orderItems; track item.id) {
+              <div class="receipt-item-row">
+                <img [src]="item.productImageUrl" [alt]="item.productName" class="receipt-item-img" />
+                <div class="receipt-item-info">
+                  <span class="receipt-item-name">{{ item.productName }}</span>
+                  <span class="receipt-item-qty">Quantity: {{ item.quantity }}</span>
+                </div>
+                <div class="receipt-item-price">
+                  <span>{{ (item.price * item.quantity) | currency:'INR':'symbol-narrow':'1.2-2' }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="receipt-divider"></div>
+
+        <div class="receipt-footer">
+          <div class="receipt-total-row">
+            <span>Total Amount Paid</span>
+            <span class="receipt-total">{{ ord.totalAmount | currency:'INR':'symbol-narrow':'1.2-2' }}</span>
+          </div>
+
+          <div class="dispatch-notice">
+            <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20" fill="currentColor">
+              <path d="M240-160q-33 0-56.5-23.5T160-240q0-33 23.5-56.5T240-320q33 0 56.5 23.5T320-240q0 33-23.5 56.5T240-160Zm400 0q-33 0-56.5-23.5T600-240q0-33 23.5-56.5T680-320q33 0 56.5 23.5T760-240q0 33-23.5 56.5T680-160ZM80-800h280l44 120h356q23 0 38 12.5t20 31.5l112 280q8 20 2.5 39.5T910-280q-12 16-29.5 26T842-244H758q-12-44-49-70t-89-26q-52 0-89 26t-49 70H378q-12-44-49-70t-89-26q-52 0-89 26t-49 70H80v-80h56l60-280H80v-80Zm182 400h456l-72-180H424l-36-96q-3-8-9.5-12.5T364-696H218l-56 256h100Z"/>
+            </svg>
+            <span>Your products will be packed and dispatched soon. Tracking link will be sent to your email.</span>
+          </div>
+
+          <a routerLink="/products" class="btn btn-primary btn-block">Continue Shopping</a>
+        </div>
+      </div>
+    }
+  }
+</div>

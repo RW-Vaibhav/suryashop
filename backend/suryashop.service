@@ -1,0 +1,18 @@
+[Unit]
+Description=SuryaShop ASP.NET Core 8 Web API
+After=network.target
+
+[Service]
+WorkingDirectory=/var/www/suryashop-api
+ExecStart=/usr/bin/dotnet /var/www/suryashop-api/backend.dll
+Restart=always
+# Restart service after 10 seconds if dotnet service crashes
+RestartSec=10
+KillSignal=SIGINT
+SyslogIdentifier=suryashop-api
+User=ubuntu
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=ASPNETCORE_URLS=http://localhost:5179
+
+[Install]
+WantedBy=multi-user.target

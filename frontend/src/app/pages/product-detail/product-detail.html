@@ -1,0 +1,123 @@
+<div class="container section-padding">
+  <!-- Back navigation -->
+  <div class="back-nav">
+    <a routerLink="/products" class="back-link">
+      <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20" fill="currentColor">
+        <path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z"/>
+      </svg>
+      Back to Products
+    </a>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-container flex-center">
+      <span class="spinner"></span>
+    </div>
+  } @else {
+    @if (product(); as prod) {
+      <!-- Detailed Product Container -->
+      <div class="product-detail-grid">
+        <!-- Left: Product Image Panel -->
+        <div class="glass-card image-panel">
+          <img [src]="prod.imageUrl" [alt]="prod.name" class="detail-image" />
+        </div>
+
+        <!-- Right: Product Information Panel -->
+        <div class="info-panel">
+          <span class="category-badge-lg">{{ prod.category }}</span>
+          <h1 class="detail-title">{{ prod.name }}</h1>
+          
+          <div class="product-rating">
+            <span class="stars">★★★★★</span>
+            <span class="rating-value">{{ prod.rating }}</span>
+            <span class="reviews-count">({{ prod.reviewsCount }} verified customer reviews)</span>
+          </div>
+
+          <div class="detail-price-box">
+            <span class="detail-price">{{ prod.price | currency:'INR':'symbol-narrow':'1.2-2' }}</span>
+          </div>
+
+          <div class="detail-divider"></div>
+
+          <div class="detail-description">
+            <h3>Description</h3>
+            <p>{{ prod.description }}</p>
+          </div>
+
+          <div class="detail-divider"></div>
+
+          <!-- Stock & Cart Actions -->
+          <div class="action-box">
+            <div class="stock-status">
+              @if (prod.stockQuantity > 0) {
+                <span class="badge badge-success">In Stock</span>
+                <span class="stock-count">Only {{ prod.stockQuantity }} units left in warehouse</span>
+              } @else {
+                <span class="badge badge-error">Out of Stock</span>
+                <span class="stock-count">Temporarily unavailable</span>
+              }
+            </div>
+
+            @if (prod.stockQuantity > 0) {
+              <div class="cart-controls">
+                <div class="qty-selector">
+                  <button (click)="decrementQty()" [disabled]="quantity() <= 1" class="qty-btn" aria-label="Decrease Quantity">-</button>
+                  <span class="qty-value">{{ quantity() }}</span>
+                  <button (click)="incrementQty()" [disabled]="quantity() >= prod.stockQuantity" class="qty-btn" aria-label="Increase Quantity">+</button>
+                </div>
+
+                <button 
+                  (click)="addToCart()" 
+                  [disabled]="isAddingToCart()" 
+                  class="btn btn-primary btn-add-cart"
+                >
+                  @if (isAddingToCart()) {
+                    <span class="spinner"></span> Adding...
+                  } @else {
+                    Add to Cart
+                  }
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Related Products Section -->
+      @if (relatedProducts().length > 0) {
+        <section class="related-section">
+          <div class="section-header-left">
+            <h2>Related Products</h2>
+            <div class="header-line"></div>
+          </div>
+
+          <div class="products-grid">
+            @for (rProd of relatedProducts(); track rProd.id) {
+              <div class="glass-card product-card">
+                <div class="product-image-wrapper">
+                  <img [src]="rProd.imageUrl" [alt]="rProd.name" class="product-image" />
+                  <span class="category-tag">{{ rProd.category }}</span>
+                </div>
+                
+                <div class="product-card-body">
+                  <h3 class="product-title">{{ rProd.name }}</h3>
+                  
+                  <div class="product-rating">
+                    <span class="stars">★</span>
+                    <span class="rating-value">{{ rProd.rating }}</span>
+                    <span class="reviews-count">({{ rProd.reviewsCount }})</span>
+                  </div>
+                  
+                  <div class="product-card-footer">
+                    <span class="product-price">{{ rProd.price | currency:'INR':'symbol-narrow':'1.2-2' }}</span>
+                    <a [routerLink]="['/product', rProd.id]" class="btn btn-secondary btn-sm-view">Details</a>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </section>
+      }
+    }
+  }
+</div>
